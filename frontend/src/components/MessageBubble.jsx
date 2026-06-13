@@ -25,6 +25,16 @@ function CodeBlock({ inline, className, children, ...props }) {
   );
 }
 
+function TypingDots() {
+  return (
+    <span className="inline-flex items-center gap-1 py-1">
+      <span className="h-2 w-2 animate-pulse-soft rounded-full bg-indigo-400" />
+      <span className="h-2 w-2 animate-pulse-soft rounded-full bg-indigo-400 [animation-delay:0.2s]" />
+      <span className="h-2 w-2 animate-pulse-soft rounded-full bg-indigo-400 [animation-delay:0.4s]" />
+    </span>
+  );
+}
+
 export default function MessageBubble({ role, content, isStreaming }) {
   const isUser = role === "user";
 
@@ -61,18 +71,20 @@ export default function MessageBubble({ role, content, isStreaming }) {
           <p className="whitespace-pre-wrap">{content}</p>
         ) : (
           <div className="markdown">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{ code: CodeBlock }}
-            >
-              {content || ""}
-            </ReactMarkdown>
-            {isStreaming && !content && (
-              <span className="inline-flex gap-1">
-                <span className="h-2 w-2 animate-pulse-soft rounded-full bg-indigo-400" />
-                <span className="h-2 w-2 animate-pulse-soft rounded-full bg-indigo-400 [animation-delay:0.2s]" />
-                <span className="h-2 w-2 animate-pulse-soft rounded-full bg-indigo-400 [animation-delay:0.4s]" />
-              </span>
+            {!content && isStreaming ? (
+              <TypingDots />
+            ) : (
+              <>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{ code: CodeBlock }}
+                >
+                  {content || ""}
+                </ReactMarkdown>
+                {isStreaming && content && (
+                  <span className="ml-0.5 inline-block h-4 w-[2px] animate-blink bg-indigo-400 align-text-bottom" />
+                )}
+              </>
             )}
           </div>
         )}

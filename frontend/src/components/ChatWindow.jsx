@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
 import { Sparkles } from "lucide-react";
 import MessageBubble from "./MessageBubble";
+import SystemBanner from "./SystemBanner";
 import ToolIndicator from "./ToolIndicator";
 
 const SUGGESTIONS = [
-  "My name is Shubham and I know React and Kotlin.",
+  "My name is Rachit and I'm a backend developer.",
   "What do you know about me?",
   "Suggest a weekend project based on my skills.",
 ];
@@ -48,19 +49,22 @@ export default function ChatWindow({ messages, isStreaming, currentTool, onPick 
     return <EmptyState onPick={onPick} />;
   }
 
-  // The last assistant message is "streaming" while a response is in flight.
   const lastId = messages[messages.length - 1]?.id;
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6">
-      {messages.map((m) => (
-        <MessageBubble
-          key={m.id}
-          role={m.role}
-          content={m.content}
-          isStreaming={isStreaming && m.id === lastId && m.role === "assistant"}
-        />
-      ))}
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-6">
+      {messages.map((m) =>
+        m.role === "system" ? (
+          <SystemBanner key={m.id} content={m.content} type={m.type} />
+        ) : (
+          <MessageBubble
+            key={m.id}
+            role={m.role}
+            content={m.content}
+            isStreaming={isStreaming && m.id === lastId && m.role === "assistant"}
+          />
+        )
+      )}
       {currentTool && (
         <div className="pl-11">
           <ToolIndicator tool={currentTool} />

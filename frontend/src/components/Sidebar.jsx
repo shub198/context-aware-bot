@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Sparkles, Plus, Brain, RefreshCw } from "lucide-react";
-import { fetchMemories } from "../api/chatApi";
+import { Sparkles, Plus, Brain, RefreshCw, FileText } from "lucide-react";
+import { fetchMemories, fetchDocuments } from "../api/chatApi";
 
 const CATEGORY_COLORS = {
   personal: "text-sky-300 bg-sky-500/10",
@@ -12,15 +12,21 @@ const CATEGORY_COLORS = {
 
 export default function Sidebar({ onNewChat, refreshKey }) {
   const [memories, setMemories] = useState([]);
+  const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
     setLoading(true);
     try {
-      const data = await fetchMemories();
-      setMemories(data.memories || []);
+      const [memData, docData] = await Promise.all([
+        fetchMemories(),
+        fetchDocuments().catch(() => ({ documents: [] })),
+      ]);
+      setMemories(memData.memories || []);
+      setDocuments(docData.documents || []);
     } catch {
       setMemories([]);
+      setDocuments([]);
     } finally {
       setLoading(false);
     }
@@ -52,6 +58,33 @@ export default function Sidebar({ onNewChat, refreshKey }) {
           <Plus size={16} /> New chat
         </button>
       </div>
+
+      {/* Uploaded documents */}
+      {documents.length > 0 && (
+        <>
+          <div className="mt-5 flex items-center gap-2 px-4 text-xs font-medium uppercase tracking-wide text-slate-400">
+            <FileText size={14} /> Documents
+          </div>
+          <div className="mt-2 space-y-1.5 px-3">
+            {documents.map((doc, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-800/30 px-2.5 py-2"
+              >
+                <FileText size={14} className="shrink-0 text-indigo-400" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium text-slate-200">
+                    {doc.filename}
+                  </p>
+                  <p className="text-[10px] text-slate-500">
+                    {doc.chunks} chunks
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Memories panel */}
       <div className="mt-5 flex items-center justify-between px-4">

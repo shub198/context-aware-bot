@@ -6,20 +6,28 @@ import FileUpload from "./components/FileUpload";
 import { useChat } from "./hooks/useChat";
 
 export default function App() {
-  const { messages, isStreaming, currentTool, sendMessage, stop } = useChat();
+  const { messages, isStreaming, currentTool, sendMessage, stop, addSystemMessage } =
+    useChat();
   const [uploadOpen, setUploadOpen] = useState(false);
   const [memoryRefreshKey, setMemoryRefreshKey] = useState(0);
 
   const handleSend = (text) => {
     sendMessage(text);
-    // After the agent likely saved/updated memory, refresh the sidebar shortly after.
     setTimeout(() => setMemoryRefreshKey((k) => k + 1), 4000);
   };
 
   const handleNewChat = () => {
     if (isStreaming) stop();
-    // Reloading resets in-memory chat state; long-term memory persists in the DB.
     window.location.reload();
+  };
+
+  const handleUploaded = (res) => {
+    addSystemMessage(
+      `**${res.filename}** uploaded and indexed (${res.chunks} chunks). You can now ask questions about it.`,
+      { type: "upload", filename: res.filename, chunks: res.chunks }
+    );
+    setMemoryRefreshKey((k) => k + 1);
+    setTimeout(() => setUploadOpen(false), 800);
   };
 
   return (
@@ -47,7 +55,7 @@ export default function App() {
       <FileUpload
         open={uploadOpen}
         onClose={() => setUploadOpen(false)}
-        onUploaded={() => setMemoryRefreshKey((k) => k + 1)}
+        onUploaded={handleUploaded}
       />
     </div>
   );
