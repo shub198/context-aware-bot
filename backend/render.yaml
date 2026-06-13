@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: context-aware-bot-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: MODEL_ID
+        value: gemini-2.0-flash
+      - key: CHROMADB_PATH
+        value: /tmp/db
+      - key: PYTHON_VERSION
+        value: 3.11.9

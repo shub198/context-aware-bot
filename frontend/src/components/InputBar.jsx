@@ -26,8 +26,8 @@ export default function InputBar({ onSend, onStop, isStreaming, onOpenUpload }) 
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pb-5">
-      <div className="flex items-end gap-2 rounded-2xl border border-slate-700/80 bg-slate-800/70 p-2 shadow-lg backdrop-blur">
+    <div className="mx-auto w-full max-w-3xl px-3 pb-safe sm:px-4">
+      <div className="flex items-end gap-1.5 rounded-2xl border border-slate-700/80 bg-slate-800/70 p-1.5 shadow-lg backdrop-blur sm:gap-2 sm:p-2">
         <button
           onClick={onOpenUpload}
           title="Upload a document"
@@ -45,8 +45,8 @@ export default function InputBar({ onSend, onStop, isStreaming, onOpenUpload }) 
             autoGrow(e.target);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Send a message…  (Enter to send, Shift+Enter for newline)"
-          className="max-h-44 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
+          placeholder="Send a message…"
+          className="max-h-44 flex-1 resize-none bg-transparent px-1.5 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none sm:px-2"
         />
 
         {isStreaming ? (
@@ -68,7 +68,7 @@ export default function InputBar({ onSend, onStop, isStreaming, onOpenUpload }) 
           </button>
         )}
       </div>
-      <p className="mt-2 text-center text-[11px] text-slate-600">
+      <p className="mt-1.5 text-center text-[10px] text-slate-600 sm:mt-2 sm:text-[11px]">
         The assistant remembers facts you share across the conversation.
       </p>
     </div>

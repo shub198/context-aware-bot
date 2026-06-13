@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
 let nextId = 1;
 
 export function useChat() {
@@ -38,7 +39,7 @@ export function useChat() {
       ctrlRef.current = ctrl;
 
       try {
-        await fetchEventSource("/api/chat/stream", {
+        await fetchEventSource(`${API_BASE}/chat/stream`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text }),

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Sparkles, Plus, Brain, RefreshCw, FileText } from "lucide-react";
+import { Sparkles, Plus, Brain, RefreshCw, FileText, PanelLeftClose } from "lucide-react";
 import { fetchMemories, fetchDocuments } from "../api/chatApi";
 
 const CATEGORY_COLORS = {
@@ -10,7 +10,7 @@ const CATEGORY_COLORS = {
   general: "text-slate-300 bg-slate-600/20",
 };
 
-export default function Sidebar({ onNewChat, refreshKey }) {
+export default function Sidebar({ onNewChat, refreshKey, isOpen, onClose, onToggle, isMobile }) {
   const [memories, setMemories] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,23 +36,32 @@ export default function Sidebar({ onNewChat, refreshKey }) {
     load();
   }, [refreshKey]);
 
-  return (
-    <aside className="flex h-full w-72 shrink-0 flex-col border-r border-slate-800 bg-slate-900/60 backdrop-blur">
-      {/* Brand */}
-      <div className="flex items-center gap-2.5 px-4 py-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600">
-          <Sparkles size={18} className="text-white" />
+  const sidebarContent = (
+    <>
+      {/* Header: Brand + collapse toggle */}
+      <div className="flex items-center justify-between px-3 py-3">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600">
+            <Sparkles size={18} className="text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-100">Context Chat</p>
+            <p className="text-[11px] text-slate-500">Powered by Gemini</p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-slate-100">Context Chat</p>
-          <p className="text-[11px] text-slate-500">Powered by Gemini</p>
-        </div>
+        <button
+          onClick={onToggle}
+          title="Close sidebar"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-800 hover:text-slate-200"
+        >
+          <PanelLeftClose size={18} />
+        </button>
       </div>
 
       {/* New chat */}
-      <div className="px-3">
+      <div className="px-3 pb-1">
         <button
-          onClick={onNewChat}
+          onClick={() => { onNewChat(); if (isMobile) onClose(); }}
           className="flex w-full items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/40 px-3 py-2.5 text-sm text-slate-200 transition hover:border-indigo-500/50 hover:bg-slate-800"
         >
           <Plus size={16} /> New chat
@@ -62,7 +71,7 @@ export default function Sidebar({ onNewChat, refreshKey }) {
       {/* Uploaded documents */}
       {documents.length > 0 && (
         <>
-          <div className="mt-5 flex items-center gap-2 px-4 text-xs font-medium uppercase tracking-wide text-slate-400">
+          <div className="mt-4 flex items-center gap-2 px-4 text-xs font-medium uppercase tracking-wide text-slate-400">
             <FileText size={14} /> Documents
           </div>
           <div className="mt-2 space-y-1.5 px-3">
@@ -87,7 +96,7 @@ export default function Sidebar({ onNewChat, refreshKey }) {
       )}
 
       {/* Memories panel */}
-      <div className="mt-5 flex items-center justify-between px-4">
+      <div className="mt-4 flex items-center justify-between px-4">
         <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-400">
           <Brain size={14} /> Long-term memory
         </div>
@@ -122,6 +131,38 @@ export default function Sidebar({ onNewChat, refreshKey }) {
             </div>
           );
         })}
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {/* Mobile: overlay */}
+        <div
+          className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
+            isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+          }`}
+          onClick={onClose}
+        />
+        <aside
+          className={`fixed left-0 top-0 z-50 flex w-72 flex-col bg-slate-900 transition-transform duration-300 ease-in-out app-shell ${
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          {sidebarContent}
+        </aside>
+      </>
+    );
+  }
+
+  return (
+    <aside
+      className="flex shrink-0 flex-col overflow-hidden border-r border-slate-800 bg-slate-900/60 transition-[width] duration-300 ease-in-out"
+      style={{ width: isOpen ? "18rem" : "0rem" }}
+    >
+      <div className="flex h-full w-72 flex-col">
+        {sidebarContent}
       </div>
     </aside>
   );
